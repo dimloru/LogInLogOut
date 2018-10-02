@@ -17,14 +17,26 @@ import java.util.Collections;
 @Controller
 @RequestMapping(path="/db")
 public class MainController {
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private JavaMailSender javaMailSender;
 
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
-    PasswordEncoder passwordEncoder;
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setJavaMailSender(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping(path="/add")
     public String addNewUserPost (@RequestParam String email) {
@@ -44,6 +56,7 @@ public class MainController {
                 message.setSubject("CCSSS Registration");
                 message.setText(password);
                 javaMailSender.send(message);
+                return "redirect:/login?success";
 
             } else {
                 return "redirect:/login?dub";
@@ -52,7 +65,7 @@ public class MainController {
             return "redirect:/login?invalid";
         }
 
-        return "redirect:/login";
+
     }
 
     @GetMapping(path="/all")

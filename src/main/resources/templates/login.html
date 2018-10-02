@@ -7,19 +7,22 @@
 </head>
 <body>
     <div th:if="${param.error}">
-        Invalid username and password.
+        Invalid username and password
     </div>
     <div th:if="${param.logout}">
-        You have been logged out.
+        You have been logged out
     </div>
     <div th:if="${param.dub}">
-        A user with this email already exists.
+        A user with this email already exists
     </div>
     <div th:if="${param.empt}">
-        Try entering a non-empty email.
+        Try entering a non-empty email
     </div>
     <div th:if="${param.invalid}">
-        The email is not correct.
+        The email is not correct
+    </div>
+    <div th:if="${param.success}">
+        Thank you for registering. A password has been sent to your email
     </div>
     <p>Sign in:</p>
     <form th:action="@{/login}" method="post">
