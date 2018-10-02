@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.HashSet;
 
 @Controller
 @RequestMapping(path="/db") //get rid of it
@@ -22,19 +21,25 @@ public class MainController {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
 
-        if (email != null && !email.isEmpty() &&
-                userRepository.findByEmail(email) == null ) {
-            User newUser = new User();
-            newUser.setEmail(email);
-            newUser.setPassword(PasswordGenerator.generate());
-            newUser.setActive(true);
-            newUser.setRoles(new HashSet<>(Collections.singletonList(Role.USER)));
 
-            userRepository.save(newUser); //wrong format exception
-        } else {
-            System.out.println("NOT NEW NOT NEW NOT NEW NOT NEW NOT NEW");
-            return "redirect:/login"; // redirectAttributes
-            // do something
+        try {
+            if (email != null && !email.isEmpty() &&
+                    userRepository.findByEmail(email) == null ) {
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setPassword(PasswordGenerator.generate());
+                newUser.setActive(true);
+                newUser.setRoles(Collections.singleton(Role.USER));
+
+                userRepository.save(newUser); //wrong format exception
+            } else {
+                System.out.println("NOT NEW NOT NEW NOT NEW NOT NEW NOT NEW");
+//                redirectAttributes.addAttribute("duplicate", "true");
+                return "redirect:/login"; // redirectAttributes
+                // do something
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // catching wrong format email exception
         }
 
 
