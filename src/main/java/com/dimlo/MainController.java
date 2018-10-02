@@ -1,11 +1,15 @@
 package com.dimlo;
 
+import com.dimlo.model.Role;
 import com.dimlo.model.User;
 import com.dimlo.repository.UserRepository;
 import com.dimlo.util.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.HashSet;
 
 @Controller
 @RequestMapping(path="/db") //get rid of it
@@ -23,6 +27,8 @@ public class MainController {
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setPassword(PasswordGenerator.generate());
+            newUser.setActive(true);
+            newUser.setRoles(new HashSet<>(Collections.singletonList(Role.USER)));
 
             userRepository.save(newUser); //wrong format exception
         } else {
@@ -32,7 +38,7 @@ public class MainController {
         }
 
 
-        return "redirect:login"; // different view like "an email with a pass has been sent..."
+        return "redirect:/login"; // different view like "an email with a pass has been sent..."
                         // + link to /login
     }
 
