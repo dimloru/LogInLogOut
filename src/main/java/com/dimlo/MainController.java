@@ -5,6 +5,8 @@ import com.dimlo.model.User;
 import com.dimlo.repository.UserRepository;
 import com.dimlo.util.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,9 @@ import java.util.Collections;
 public class MainController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @PostMapping(path="/add")
     public String addNewUserPost (@RequestParam String email) {
@@ -32,6 +37,13 @@ public class MainController {
                 newUser.setRoles(Collections.singleton(Role.USER));
 
                 userRepository.save(newUser); //wrong format exception
+
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(email);
+                message.setSubject("CCSSS Registration");
+                message.setText(newUser.getPassword());
+                javaMailSender.send(message);
+
             } else {
                 System.out.println("NOT NEW NOT NEW NOT NEW NOT NEW NOT NEW");
 //                redirectAttributes.addAttribute("duplicate", "true");
