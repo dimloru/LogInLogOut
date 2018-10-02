@@ -32,7 +32,7 @@ public class MainController {
                     userRepository.findByEmail(email) == null ) {
                 User newUser = new User();
                 newUser.setEmail(email);
-                newUser.setPassword(PasswordGenerator.generate());
+                newUser.setPassword(PasswordGenerator.simpleGenerate());
                 newUser.setActive(true);
                 newUser.setRoles(Collections.singleton(Role.USER));
 
