@@ -12,6 +12,15 @@
     <div th:if="${param.logout}">
         You have been logged out.
     </div>
+    <div th:if="${param.dub}">
+        A user with this email already exists.
+    </div>
+    <div th:if="${param.empt}">
+        Try entering a non-empty email.
+    </div>
+    <div th:if="${param.invalid}">
+        The email is not correct.
+    </div>
     <p>Sign in:</p>
     <form th:action="@{/login}" method="post">
         <div><label> User Name : <input type="text" name="username"/> </label></div>
