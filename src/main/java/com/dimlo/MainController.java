@@ -40,10 +40,11 @@ public class MainController {
 
     @PostMapping(path="/add")
     public String addNewUserPost (@RequestParam String email) {
+        String emailLowerCase = email.toLowerCase();
         try {
-            if (userRepository.findByEmail(email) == null ) {
+            if (userRepository.findByEmail(emailLowerCase) == null ) {
                 User newUser = new User();
-                newUser.setEmail(email);
+                newUser.setEmail(emailLowerCase);
                 String password = PasswordGenerator.simpleGenerate();
                 newUser.setPassword(passwordEncoder.encode(password));
                 newUser.setActive(true);
@@ -52,7 +53,7 @@ public class MainController {
                 userRepository.save(newUser);
 
                 SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(email);
+                message.setTo(emailLowerCase);
                 message.setSubject("CCSSS Registration");
                 message.setText(password);
                 javaMailSender.send(message);
