@@ -7,13 +7,15 @@ import com.dimlo.util.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
 @Controller
-@RequestMapping(path="/db") //get rid of it
+@RequestMapping(path="/db")
 public class MainController {
     @Autowired
     private UserRepository userRepository;
@@ -21,47 +23,40 @@ public class MainController {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @PostMapping(path="/add")
     public String addNewUserPost (@RequestParam String email) {
-        // @ResponseBody means the returned String is the response, not a view name
-        // @RequestParam means it is a parameter from the GET or POST request
-
-
         try {
-            if (email != null && !email.isEmpty() &&
-                    userRepository.findByEmail(email) == null ) {
+            if (userRepository.findByEmail(email) == null ) {
                 User newUser = new User();
                 newUser.setEmail(email);
-                newUser.setPassword(PasswordGenerator.simpleGenerate());
+                String password = PasswordGenerator.simpleGenerate();
+                newUser.setPassword(passwordEncoder.encode(password));
                 newUser.setActive(true);
                 newUser.setRoles(Collections.singleton(Role.USER));
 
-                userRepository.save(newUser); //wrong format exception
+                userRepository.save(newUser);
 
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(email);
                 message.setSubject("CCSSS Registration");
-                message.setText(newUser.getPassword());
+                message.setText(password);
                 javaMailSender.send(message);
 
             } else {
-                System.out.println("NOT NEW NOT NEW NOT NEW NOT NEW NOT NEW");
-//                redirectAttributes.addAttribute("duplicate", "true");
-                return "redirect:/login"; // redirectAttributes
-                // do something
+                return "redirect:/login?dub";
             }
-        } catch (Exception e) {
-            e.printStackTrace(); // catching wrong format email exception
+        } catch (TransactionSystemException e) {
+            return "redirect:/login?invalid";
         }
 
-
-        return "redirect:/login"; // different view like "an email with a pass has been sent..."
-                        // + link to /login
+        return "redirect:/login";
     }
 
     @GetMapping(path="/all")
     public @ResponseBody Iterable<User> getAllUsers() {
-        // This returns a JSON or XML with the users
         return userRepository.findAll();
     }
 }
